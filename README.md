@@ -1,35 +1,34 @@
 # PeoTraveller — AI-Powered Travel Companion
 
-> A web-based platform for tourists and local travellers to discover places, plan trips, organize adventures, and share memories — all powered by AI.
+> A web-based platform for tourists and local travellers to discover places, plan trips, organize adventures, and share memories.
 
 ---
 
-## 📖 Overview
+## About
 
-TravelSphere is a web application designed to be the ultimate travel companion for both tourists and local explorers. It helps users discover destinations, curate personal travel lists, find accommodation and camping essentials, budget trips, and relive shared memories — with AI at the core of the experience.
+TravelSphere is a web application designed to be the ultimate travel companion for both tourists and local explorers. It helps users discover destinations, curate personal travel lists, find accommodation and camping essentials, budget trips, and relive shared memories.
 
 The platform stands out through its **AI-powered smart search**, which allows users to find places using images or natural language descriptions, and an **AI trip planner** that generates personalized itineraries including hotel and attraction suggestions.
 
 ---
 
-## ✨ Key Features
+## Features
 
-### 🔍 AI-Powered Smart Search
+### AI-Powered Smart Search
 - **Image-based search** — Upload a photo of a place and the AI identifies it and surfaces related destinations.
-- **Description-based search** — Describe a place in natural language (e.g., *"a quiet beach with clear water and no crowds"*) and the LLM suggests matching locations.
-- Powered by an LLM model *(model TBD)*.
+- **Description-based search** — Describe a place in natural language and the LLM suggests matching locations.
 
-### 📍 Place Discovery
+### Place Discovery
 - Browse and explore curated places — tourist attractions, rest stops, scenic spots, and hidden gems.
 - View rich place details including photos, reviews, and location info.
 - Filter by category: beaches, mountains, rest areas, cultural sites, and more.
 
-### 📋 Personal Travel Lists
+### Personal Travel Lists
 - Save places into custom lists (e.g., *"Places to Visit Next"*, *"Weekend Getaways"*).
 - Organize and manage lists with tags, priorities, and notes.
 - Access saved lists across devices.
 
-### 🗺️ AI Trip Planner
+### AI Trip Planner
 - Input destination, dates, budget, and preferences.
 - AI generates a full itinerary including:
   - Recommended places to visit
@@ -38,24 +37,24 @@ The platform stands out through its **AI-powered smart search**, which allows us
 - Calculates estimated costs and travel logistics.
 - AI workflow engine *(model and orchestration TBD)*.
 
-### 🏕️ Camping & Rest Place Finder
+### Camping & Rest Place Finder
 - Discover rest stops along travel routes.
 - Find camping-friendly locations with details on amenities.
 - Search for equipment rental and camping gear suppliers nearby.
 
-### 💰 Trip Cost Organizer
+### Trip Cost Organizer
 - Estimate and track travel expenses.
 - Calculate costs for accommodation, transport, food, and activities.
 - Set budgets and get AI-assisted cost breakdowns per trip.
 
-### 📸 Memory Sharing
+### Memory Sharing
 - Upload and share photos and travel stories from past trips.
 - Explore memories shared by other travellers at the same locations.
 - Build a community travel journal tied to specific places.
 
 ---
 
-## 🧩 System Modules
+## System Modules
 
 | Module | Description |
 |---|---|
@@ -70,22 +69,20 @@ The platform stands out through its **AI-powered smart search**, which allows us
 
 ---
 
-## 🛠️ Tech Stack
-
-> ⚠️ **Note:** The following are initial considerations. Final technology choices for the LLM model and database are not yet confirmed and will be decided during the architecture phase.
+## Tech Stack
 
 | Layer | Status | Notes |
 |---|---|---|
-| **Frontend** | TBD | Web-based (mobile responsive) |
-| **Backend** | TBD | REST / GraphQL API |
-| **LLM Model** | ⏳ Not confirmed | For smart search and trip planning AI |
-| **Database** | ⏳ Not confirmed | For places, users, lists, memories |
-| **Image Processing** | TBD | For image-based place search |
-| **Authentication** | TBD | User accounts and sessions |
+| **Frontend**
+| **Backend**
+| **LLM Model**
+| **Database**
+| **Image Processing**
+| **Authentication**
 
 ---
 
-## 🎯 Target Users
+## Target Users
 
 - **Tourists** visiting new cities or countries seeking curated travel guidance.
 - **Local travellers** looking to explore nearby places, rest stops, or camping sites.
@@ -94,7 +91,7 @@ The platform stands out through its **AI-powered smart search**, which allows us
 
 ---
 
-## 🗂️ Project Status
+## Project Status
 
 This project is currently in the **initial planning and backlog definition phase**.
 
@@ -109,23 +106,7 @@ This project is currently in the **initial planning and backlog definition phase
 
 ---
 
-## 📁 Repository Structure *(Planned)*
-
-```
-travelsphere/
-├── frontend/          # Web application (UI)
-├── backend/           # API server and business logic
-├── ai-services/       # LLM integration for search and trip planning
-├── docs/              # Project documentation
-│   ├── epics/         # Epic definitions
-│   ├── stories/       # User stories
-│   └── backlog/       # Product backlog
-└── README.md
-```
-
----
-
-## 📌 Next Steps
+## Next Steps
 
 1. Define Epics and break down into User Stories
 2. Build and prioritize the Product Backlog
@@ -135,13 +116,7 @@ travelsphere/
 
 ---
 
-## 🤝 Contributing
-
-This project is in early stages. Contribution guidelines will be added once the initial architecture and backlog are established.
-
----
-
-## 📄 License
+## License
 
 License TBD.
 
