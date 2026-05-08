@@ -133,7 +133,7 @@ The platform stands out through its **AI-powered smart search**, which allows us
 
 ---
 
-### Epic 3 — Explore Journey Planner Key Feature
+### Epic 3 — Explore Journey Planner (Key Feature)
 
 > Core feature. User provides preferences and the system plans a complete journey — places, optimal route map, hotels, camping, transport, gear, and budget.
 
