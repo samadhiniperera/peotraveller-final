@@ -73,12 +73,12 @@ The platform stands out through its **AI-powered smart search**, which allows us
 
 | Layer | Technology | Status |
 |---|---|---|
-| **Frontend** | TBD | Not selected |
-| **Backend** | TBD | Not selected |
-| **LLM Model** | TBD | Not selected |
-| **Database** | TBD | Not selected |
-| **Image Processing** | TBD | Not selected |
-| **Authentication** | TBD | Not selected |
+| **Frontend** | Next.js(Web)/ React Native(Mobile) | Maximum code reuse, fast performance |
+| **Backend** | Python + FastAPI | Support for AI libraries and Async requests |
+| **AI Processing** | LangChain | Flexible intergration for any LLM or image Model |
+| **Database** | PostgreSQL + pgVector | Handle user data and Semantic search |
+| **Deployement** | Vercel(Web)/ AWS(Backend) | Auto scaling |
+| **Authentication** | null | null |
 
 ---
 
