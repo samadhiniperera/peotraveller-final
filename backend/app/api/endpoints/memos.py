@@ -1,10 +1,10 @@
 import os
 import uuid
-from typing import List
+from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
 from sqlalchemy.orm import Session
 
-from app.db.database import get_db
+from app.api.dependencies import get_db
 from app.models.memo import Memo, MemoMedia, MemoTag, VisibilityEnum
 from app.models.tag import Tag
 from app.schemas.memo import MemoUpdate, MemoResponse
@@ -31,16 +31,37 @@ async def save_file(file: UploadFile) -> tuple[str, str]:
 # ── CREATE memo ──────────────────────────────────────────────────
 @router.post("/", response_model=MemoResponse)
 async def create_memo(
-    place_id    : int              = Form(...),
-    description : str              = Form(None),
-    visibility  : VisibilityEnum   = Form(VisibilityEnum.private),
-    tag_ids     : str              = Form(""),
-    files       : List[UploadFile] = File([]),
-    db          : Session          = Depends(get_db),
-    current_user: User             = Depends(get_current_user),
+    place_name  : str            = Form(...),
+    place_id    : Optional[int]  = Form(None),
+    description : Optional[str]  = Form(None),
+    visibility  : VisibilityEnum = Form(VisibilityEnum.private),
+    tag_ids     : str            = Form(...),
+    files       : List[UploadFile] = File(default=[]),
+    db          : Session        = Depends(get_db),
+    current_user: User           = Depends(get_current_user),
 ):
+    # ── validate tags ────────────────────────────────────────────
+    tag_id_list = [int(t.strip()) for t in tag_ids.split(",") if t.strip()]
+    if not tag_id_list:
+        raise HTTPException(
+            status_code=422,
+            detail="At least one tag is required"
+        )
+
+    # ── validate place_id if provided ────────────────────────────
+    if place_id is not None:
+        from app.models.place import Place
+        place = db.query(Place).filter(Place.id == place_id).first()
+        if not place:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Place with id {place_id} not found"
+            )
+
+    # ── create memo ──────────────────────────────────────────────
     memo = Memo(
         user_id     = current_user.id,
+        place_name  = place_name,
         place_id    = place_id,
         description = description,
         visibility  = visibility,
@@ -48,23 +69,39 @@ async def create_memo(
     db.add(memo)
     db.flush()
 
-    # attach tags
-    if tag_ids:
-        for tag_id in [int(t) for t in tag_ids.split(",") if t]:
-            tag = db.query(Tag).filter(Tag.id == tag_id).first()
-            if tag:
-                db.add(MemoTag(memo_id=memo.id, tag_id=tag.id))
+    # ── attach tags ──────────────────────────────────────────────
+    valid_tags = 0
+    for tag_id in tag_id_list:
+        tag = db.query(Tag).filter(Tag.id == tag_id).first()
+        if tag:
+            db.add(MemoTag(memo_id=memo.id, tag_id=tag.id))
+            valid_tags += 1
 
-    # save media
-    for i, file in enumerate(files):
-        if file.filename:
-            url, media_type = await save_file(file)
-            db.add(MemoMedia(
-                memo_id        = memo.id,
-                file_url       = url,
-                media_type     = media_type,
-                order_position = i,
-            ))
+    if valid_tags == 0:
+        db.rollback()
+        raise HTTPException(
+            status_code=422,
+            detail="No valid tags found. Please provide valid tag IDs."
+        )
+
+    # ── save media files ─────────────────────────────────────────
+    if files:
+        for i, file in enumerate(files):
+            # ← skip if not a real uploaded file
+            if not isinstance(file, UploadFile):
+                continue
+            if not file.filename or file.filename.strip() == "":
+                continue
+            try:
+                url, media_type = await save_file(file)
+                db.add(MemoMedia(
+                    memo_id        = memo.id,
+                    file_url       = url,
+                    media_type     = media_type,
+                    order_position = i,
+                ))
+            except Exception:
+                continue  # skip broken files silently
 
     db.commit()
     db.refresh(memo)
@@ -114,12 +151,19 @@ def update_memo(
     if memo.user_id != current_user.id:
         raise HTTPException(status_code=403, detail="Not your memo")
 
+    if data.place_name is not None:
+        memo.place_name  = data.place_name
     if data.description is not None:
         memo.description = data.description
     if data.visibility is not None:
-        memo.visibility = data.visibility
+        memo.visibility  = data.visibility
 
     if data.tag_ids is not None:
+        if len(data.tag_ids) == 0:
+            raise HTTPException(
+                status_code=422,
+                detail="At least one tag is required"
+            )
         db.query(MemoTag).filter(MemoTag.memo_id == memo.id).delete()
         for tag_id in data.tag_ids:
             tag = db.query(Tag).filter(Tag.id == tag_id).first()
@@ -165,7 +209,7 @@ async def add_media(
 
     existing_count = len(memo.media)
     for i, file in enumerate(files):
-        if file.filename:
+        if isinstance(file, UploadFile) and file.filename:
             url, media_type = await save_file(file)
             db.add(MemoMedia(
                 memo_id        = memo.id,

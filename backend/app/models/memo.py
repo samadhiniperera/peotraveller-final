@@ -25,21 +25,21 @@ class Memo(Base):
 
     id          = Column(Integer, primary_key=True, index=True)
     user_id     = Column(Integer, ForeignKey("users.id"), nullable=False)
-    place_id    = Column(Integer, ForeignKey("places.id"), nullable=False)
+    place_name  = Column(String,  nullable=False)              # ← NEW — traveler enters this
+    place_id    = Column(Integer, ForeignKey("places.id"),
+                         nullable=True)                        # ← optional link to DB place
     description = Column(Text, nullable=True)
     visibility  = Column(
         Enum(VisibilityEnum),
-
-        default=VisibilityEnum.public,
-
+        default=VisibilityEnum.private,
         nullable=False
     )
     created_at  = Column(DateTime, default=func.now())
     updated_at  = Column(DateTime, default=func.now(), onupdate=func.now())
 
-    # relationships
-    user   = relationship("User",    back_populates="memos")
-    place  = relationship("Place",   back_populates="memos")
+    user   = relationship("User",      back_populates="memos")
+    place  = relationship("Place",     back_populates="memos",
+                          foreign_keys=[place_id])
     media  = relationship("MemoMedia", back_populates="memo",
                           cascade="all, delete-orphan",
                           order_by="MemoMedia.order_position")
@@ -53,9 +53,9 @@ class MemoMedia(Base):
 
     id             = Column(Integer, primary_key=True, index=True)
     memo_id        = Column(Integer, ForeignKey("memos.id"), nullable=False)
-    file_url       = Column(String,  nullable=False)   # S3 / storage URL
-    media_type     = Column(String,  nullable=False)   # "image" or "video"
-    order_position = Column(Integer, default=0)        # display order
+    file_url       = Column(String,  nullable=False)
+    media_type     = Column(String,  nullable=False)
+    order_position = Column(Integer, default=0)
 
     memo = relationship("Memo", back_populates="media")
 
@@ -68,7 +68,7 @@ class MemoTag(Base):
     tag_id  = Column(Integer, ForeignKey("tags.id"),  primary_key=True)
 
     memo = relationship("Memo", back_populates="tags")
-    tag  = relationship("Tag")
+    tag  = relationship("Tag",  back_populates="memos")
 
 
 # ── Friendship ───────────────────────────────────────────────────

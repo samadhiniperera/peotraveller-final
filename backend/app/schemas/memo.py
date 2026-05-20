@@ -27,14 +27,8 @@ class MemoTagResponse(BaseModel):
         from_attributes = True
 
 
-class MemoCreate(BaseModel):
-    place_id    : int
-    description : Optional[str]        = None
-    visibility  : VisibilityEnum       = VisibilityEnum.private
-    tag_ids     : List[int]            = []
-
-
 class MemoUpdate(BaseModel):
+    place_name  : Optional[str]            = None   # ← added
     description : Optional[str]            = None
     visibility  : Optional[VisibilityEnum] = None
     tag_ids     : Optional[List[int]]      = None
@@ -43,7 +37,8 @@ class MemoUpdate(BaseModel):
 class MemoResponse(BaseModel):
     id          : int
     user_id     : int
-    place_id    : int
+    place_name  : str                             # ← added
+    place_id    : Optional[int]                   # ← now optional
     description : Optional[str]
     visibility  : VisibilityEnum
     created_at  : datetime
