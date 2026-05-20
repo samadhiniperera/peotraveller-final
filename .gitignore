@@ -1,5 +1,9 @@
 # Compiled class file
 *.class
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
 
 # Log file
 *.log
@@ -22,3 +26,14 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 replay_pid*
+
+# Python compiled files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+env/
+.env
