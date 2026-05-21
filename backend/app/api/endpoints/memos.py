@@ -242,3 +242,22 @@ def delete_media(
     db.delete(media)
     db.commit()
     return {"message": "Media deleted"}
+
+# ── CHANGE VISIBILITY ─────────────────────────────────────────────
+@router.patch("/{memo_id}/visibility", response_model=MemoResponse)
+def change_visibility(
+    memo_id     : int,
+    visibility  : VisibilityEnum,
+    db          : Session = Depends(get_db),
+    current_user: User    = Depends(get_current_user),
+):
+    memo = db.query(Memo).filter(Memo.id == memo_id).first()
+    if not memo:
+        raise HTTPException(status_code=404, detail="Memo not found")
+    if memo.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not your memo")
+
+    memo.visibility = visibility
+    db.commit()
+    db.refresh(memo)
+    return memo
