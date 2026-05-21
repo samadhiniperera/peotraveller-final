@@ -122,6 +122,20 @@ def get_my_memos(
     )
 
 
+# ── GET public memos ──────────────────────────────────────────────
+@router.get("/public", response_model=List[MemoResponse])
+def get_public_memos(
+    db          : Session = Depends(get_db),
+    current_user: User    = Depends(get_current_user),
+):
+    return (
+        db.query(Memo)
+        .filter(Memo.visibility == VisibilityEnum.public)
+        .order_by(Memo.created_at.desc())
+        .all()
+    )
+
+
 # ── GET single memo ──────────────────────────────────────────────
 @router.get("/{memo_id}", response_model=MemoResponse)
 def get_memo(
