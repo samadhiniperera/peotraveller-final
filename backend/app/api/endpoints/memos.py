@@ -1,7 +1,7 @@
 import os
 import uuid
 from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, Query
 from sqlalchemy.orm import Session
 
 from app.api.dependencies import get_db
@@ -36,7 +36,6 @@ async def create_memo(
     description : Optional[str]  = Form(None),
     visibility  : VisibilityEnum = Form(VisibilityEnum.private),
     tag_ids     : str            = Form(...),
-    files       : List[UploadFile] = File(default=[]),
     db          : Session        = Depends(get_db),
     current_user: User           = Depends(get_current_user),
 ):
@@ -83,25 +82,6 @@ async def create_memo(
             status_code=422,
             detail="No valid tags found. Please provide valid tag IDs."
         )
-
-    # ── save media files ─────────────────────────────────────────
-    if files:
-        for i, file in enumerate(files):
-            # ← skip if not a real uploaded file
-            if not isinstance(file, UploadFile):
-                continue
-            if not file.filename or file.filename.strip() == "":
-                continue
-            try:
-                url, media_type = await save_file(file)
-                db.add(MemoMedia(
-                    memo_id        = memo.id,
-                    file_url       = url,
-                    media_type     = media_type,
-                    order_position = i,
-                ))
-            except Exception:
-                continue  # skip broken files silently
 
     db.commit()
     db.refresh(memo)
@@ -189,6 +169,29 @@ def update_memo(
     return memo
 
 
+# ── CHANGE VISIBILITY ─────────────────────────────────────────────
+@router.patch("/{memo_id}/visibility", response_model=MemoResponse)
+def change_visibility(
+    memo_id    : int,
+    visibility : VisibilityEnum = Query(
+        ...,
+        description="Choose: public | friends_only | private"
+    ),
+    db         : Session = Depends(get_db),
+    current_user: User   = Depends(get_current_user),
+):
+    memo = db.query(Memo).filter(Memo.id == memo_id).first()
+    if not memo:
+        raise HTTPException(status_code=404, detail="Memo not found")
+    if memo.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not your memo")
+
+    memo.visibility = visibility
+    db.commit()
+    db.refresh(memo)
+    return memo
+
+
 # ── DELETE memo ──────────────────────────────────────────────────
 @router.delete("/{memo_id}")
 def delete_memo(
@@ -208,12 +211,12 @@ def delete_memo(
 
 
 # ── ADD media to existing memo ───────────────────────────────────
-@router.post("/{memo_id}/media")
+@router.post("/{memo_id}/media", response_model=MemoResponse)
 async def add_media(
     memo_id     : int,
-    files       : List[UploadFile] = File(...),
-    db          : Session          = Depends(get_db),
-    current_user: User             = Depends(get_current_user),
+    file        : UploadFile = File(...),
+    db          : Session    = Depends(get_db),
+    current_user: User       = Depends(get_current_user),
 ):
     memo = db.query(Memo).filter(Memo.id == memo_id).first()
     if not memo:
@@ -221,20 +224,28 @@ async def add_media(
     if memo.user_id != current_user.id:
         raise HTTPException(status_code=403, detail="Not your memo")
 
-    existing_count = len(memo.media)
-    for i, file in enumerate(files):
-        if isinstance(file, UploadFile) and file.filename:
-            url, media_type = await save_file(file)
-            db.add(MemoMedia(
-                memo_id        = memo.id,
-                file_url       = url,
-                media_type     = media_type,
-                order_position = existing_count + i,
-            ))
+    # ── validate file type ───────────────────────────────────────
+    allowed = ["jpg", "jpeg", "png", "gif", "webp", "mp4", "mov"]
+    ext     = file.filename.split(".")[-1].lower()
+    if ext not in allowed:
+        raise HTTPException(
+            status_code=400,
+            detail=f"File type .{ext} not allowed. Allowed: {allowed}"
+        )
+
+    url, media_type = await save_file(file)
+    existing_count  = len(memo.media)
+
+    db.add(MemoMedia(
+        memo_id        = memo.id,
+        file_url       = url,
+        media_type     = media_type,
+        order_position = existing_count,
+    ))
 
     db.commit()
     db.refresh(memo)
-    return {"message": "Media added", "total_media": len(memo.media)}
+    return memo
 
 
 # ── DELETE single media ──────────────────────────────────────────
