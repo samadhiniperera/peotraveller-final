@@ -21,3 +21,4 @@ class User(Base):
                                    foreign_keys="Friendship.requester_id")
     received_requests= relationship("Friendship", back_populates="receiver",
                                    foreign_keys="Friendship.receiver_id")
+    profile          = relationship("UserProfile", back_populates="user", uselist=False)
