@@ -34,9 +34,17 @@ class ProfileBase(BaseModel):
     friend_list: Optional[str] = None
 
 
-class ProfileResponse(BaseModel):
+class ProfilePicResponse(BaseModel):
     id: int
     user_id: int
+    profile_image_url:str
+    
     
     class Config:
         from_attributes = True
+
+
+class ProfilePicUpdate(BaseModel):
+    profile_image_url:str
+    
+    
