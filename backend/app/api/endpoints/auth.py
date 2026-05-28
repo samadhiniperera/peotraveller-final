@@ -24,7 +24,8 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
     new_user = User(
         email         = user.email,
         name          = user.name,
-        password_hash = hashed_password
+        password_hash = hashed_password,
+        role          = user.role
     )
     db.add(new_user)
     db.commit()
@@ -46,8 +47,14 @@ def login(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    access_token = create_access_token(data={"sub": db_user.email})
-    return {"access_token": access_token, "token_type": "bearer"}
+    access_token = create_access_token(
+        data={"sub": db_user.email, "role": db_user.role.value}
+    )
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "role": db_user.role.value
+    }
 
 
 # ── GET CURRENT USER ──────────────────────────────────────────────
