@@ -475,8 +475,14 @@ export async function getWishlist() {
       headers: getAuthHeaders(),
     });
 
+    if (response.status === 401) {
+      logoutUser();
+      throw new Error("Authentication required. Please sign in again.");
+    }
+
     if (!response.ok) {
-      throw new Error("Failed to fetch wishlist");
+      const error = await response.json().catch(() => null);
+      throw new Error(error?.detail || "Failed to fetch wishlist");
     }
 
     return await response.json();
@@ -507,17 +513,19 @@ export async function addToWishlist(placeId: string) {
 
 export async function removeFromWishlist(placeId: string) {
   try {
-    const token = localStorage.getItem("authToken");
     const response = await fetch(`${BASE_URL}/api/wishlists/${placeId}`, {
       method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
+      headers: getAuthHeaders(),
     });
 
+    if (response.status === 401) {
+      logoutUser();
+      throw new Error("Authentication required. Please sign in again.");
+    }
+
     if (!response.ok) {
-      throw new Error("Failed to remove from wishlist");
+      const error = await response.json().catch(() => null);
+      throw new Error(error?.detail || "Failed to remove from wishlist");
     }
 
     return await response.json();

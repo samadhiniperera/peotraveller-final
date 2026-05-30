@@ -10,8 +10,14 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WishlistRouteImport } from './routes/wishlist'
+import { Route as SignupRouteImport } from './routes/signup'
+import { Route as SearchRouteImport } from './routes/search'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as PlannerRouteImport } from './routes/planner'
+import { Route as MemosRouteImport } from './routes/memos'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as CostRouteImport } from './routes/cost'
+import { Route as CampingRouteImport } from './routes/camping'
 import { Route as PlacesRouteImport } from './routes/Places'
 import { Route as IndexRouteImport } from './routes/index'
 
@@ -20,14 +26,44 @@ const WishlistRoute = WishlistRouteImport.update({
   path: '/wishlist',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SearchRoute = SearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PlannerRoute = PlannerRouteImport.update({
+  id: '/planner',
+  path: '/planner',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MemosRoute = MemosRouteImport.update({
+  id: '/memos',
+  path: '/memos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CostRoute = CostRouteImport.update({
+  id: '/cost',
+  path: '/cost',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CampingRoute = CampingRouteImport.update({
+  id: '/camping',
+  path: '/camping',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PlacesRoute = PlacesRouteImport.update({
@@ -44,38 +80,96 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/Places': typeof PlacesRoute
+  '/camping': typeof CampingRoute
+  '/cost': typeof CostRoute
   '/login': typeof LoginRoute
+  '/memos': typeof MemosRoute
+  '/planner': typeof PlannerRoute
   '/profile': typeof ProfileRoute
+  '/search': typeof SearchRoute
+  '/signup': typeof SignupRoute
   '/wishlist': typeof WishlistRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/Places': typeof PlacesRoute
+  '/camping': typeof CampingRoute
+  '/cost': typeof CostRoute
   '/login': typeof LoginRoute
+  '/memos': typeof MemosRoute
+  '/planner': typeof PlannerRoute
   '/profile': typeof ProfileRoute
+  '/search': typeof SearchRoute
+  '/signup': typeof SignupRoute
   '/wishlist': typeof WishlistRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/Places': typeof PlacesRoute
+  '/camping': typeof CampingRoute
+  '/cost': typeof CostRoute
   '/login': typeof LoginRoute
+  '/memos': typeof MemosRoute
+  '/planner': typeof PlannerRoute
   '/profile': typeof ProfileRoute
+  '/search': typeof SearchRoute
+  '/signup': typeof SignupRoute
   '/wishlist': typeof WishlistRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/Places' | '/login' | '/profile' | '/wishlist'
+  fullPaths:
+    | '/'
+    | '/Places'
+    | '/camping'
+    | '/cost'
+    | '/login'
+    | '/memos'
+    | '/planner'
+    | '/profile'
+    | '/search'
+    | '/signup'
+    | '/wishlist'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/Places' | '/login' | '/profile' | '/wishlist'
-  id: '__root__' | '/' | '/Places' | '/login' | '/profile' | '/wishlist'
+  to:
+    | '/'
+    | '/Places'
+    | '/camping'
+    | '/cost'
+    | '/login'
+    | '/memos'
+    | '/planner'
+    | '/profile'
+    | '/search'
+    | '/signup'
+    | '/wishlist'
+  id:
+    | '__root__'
+    | '/'
+    | '/Places'
+    | '/camping'
+    | '/cost'
+    | '/login'
+    | '/memos'
+    | '/planner'
+    | '/profile'
+    | '/search'
+    | '/signup'
+    | '/wishlist'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   PlacesRoute: typeof PlacesRoute
+  CampingRoute: typeof CampingRoute
+  CostRoute: typeof CostRoute
   LoginRoute: typeof LoginRoute
+  MemosRoute: typeof MemosRoute
+  PlannerRoute: typeof PlannerRoute
   ProfileRoute: typeof ProfileRoute
+  SearchRoute: typeof SearchRoute
+  SignupRoute: typeof SignupRoute
   WishlistRoute: typeof WishlistRoute
 }
 
@@ -88,6 +182,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WishlistRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/search': {
+      id: '/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/profile': {
       id: '/profile'
       path: '/profile'
@@ -95,11 +203,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/planner': {
+      id: '/planner'
+      path: '/planner'
+      fullPath: '/planner'
+      preLoaderRoute: typeof PlannerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/memos': {
+      id: '/memos'
+      path: '/memos'
+      fullPath: '/memos'
+      preLoaderRoute: typeof MemosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cost': {
+      id: '/cost'
+      path: '/cost'
+      fullPath: '/cost'
+      preLoaderRoute: typeof CostRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/camping': {
+      id: '/camping'
+      path: '/camping'
+      fullPath: '/camping'
+      preLoaderRoute: typeof CampingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/Places': {
@@ -122,8 +258,14 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   PlacesRoute: PlacesRoute,
+  CampingRoute: CampingRoute,
+  CostRoute: CostRoute,
   LoginRoute: LoginRoute,
+  MemosRoute: MemosRoute,
+  PlannerRoute: PlannerRoute,
   ProfileRoute: ProfileRoute,
+  SearchRoute: SearchRoute,
+  SignupRoute: SignupRoute,
   WishlistRoute: WishlistRoute,
 }
 export const routeTree = rootRouteImport

@@ -1,30 +1,3 @@
-// import { createFileRoute } from "@tanstack/react-router";
-// import { LoginForm } from "@/components/LoginForm";
-
-// export const Route = createFileRoute("/login")({
-//   component: LoginPage,
-//   head: () => ({
-//     meta: [
-//       { title: "Login — Roamly" },
-//       {
-//         name: "description",
-//         content: "Sign in to your Roamly account and start planning your trips.",
-//       },
-//     ],
-//   }),
-// });
-
-// function LoginPage() {
-//   return (
-//     <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20">
-//       <div className="flex items-center justify-center min-h-[calc(100vh-80px)] px-4 py-16">
-//         <LoginForm />
-//       </div>
-//     </div>
-//   );
-// }
-
-
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Loader2, Mail, Lock, Eye, EyeOff, Compass } from "lucide-react";
@@ -143,7 +116,7 @@ function LoginPage() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4" autoComplete="off">
             <div className="space-y-1.5">
               <Label htmlFor="email" className="text-sm font-medium">Email address</Label>
               <div className="relative">
@@ -151,7 +124,8 @@ function LoginPage() {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="you@example.com"
+                  autoComplete="off"
+                  placeholder="example@traveler.com"
                   className="pl-10 rounded-xl border-border/70 h-11"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -173,7 +147,8 @@ function LoginPage() {
                 <Input
                   id="password"
                   type={showPw ? "text" : "password"}
-                  placeholder="••••••••"
+                  autoComplete="new-password"
+                  placeholder="Example123!"
                   className="pl-10 pr-10 rounded-xl border-border/70 h-11"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -202,6 +177,9 @@ function LoginPage() {
                 "Sign in"
               )}
             </Button>
+            <p className="mt-3 text-xs text-muted-foreground">
+              Enter your registered email and a strong password. Example: user@example.com and a secure password with at least 8 characters.
+            </p>
           </form>
 
           <div className="relative">

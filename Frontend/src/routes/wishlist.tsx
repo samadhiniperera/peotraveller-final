@@ -175,6 +175,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getWishlist, removeFromWishlist } from "@/lib/api";
+import { useAuth } from "@/lib/auth";
 import { BookHeart, MapPin, Trash2, Loader2, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -210,6 +211,7 @@ type WishlistItem = {
 
 function WishlistPage() {
   const queryClient = useQueryClient();
+  const { isAuthenticated, loading: authLoading } = useAuth();
 
   const { data: items = [], isLoading, isError } = useQuery<WishlistItem[]>({
     queryKey: ["wishlist"],
@@ -217,6 +219,8 @@ function WishlistPage() {
       const result = await getWishlist();
       return Array.isArray(result) ? result : [];
     },
+    enabled: isAuthenticated && !authLoading,
+    retry: false,
   });
 
   const removeMutation = useMutation({
@@ -275,7 +279,23 @@ function WishlistPage() {
 
       {/* Content */}
       <main className="container mx-auto px-4 sm:px-6 py-10">
-        {isLoading ? (
+        {authLoading ? (
+          <div className="flex justify-center items-center py-20">
+            <Loader2 className="h-8 w-8 animate-spin" style={{ color: "oklch(0.560 0.110 155)" }} />
+          </div>
+        ) : !isAuthenticated ? (
+          <div
+            className="rounded-2xl p-6 text-sm"
+            style={{ background: "oklch(0.560 0.110 155 / 0.08)", color: "oklch(0.200 0.025 240)", border: "1px solid oklch(0.560 0.110 155 / 0.15)" }}
+          >
+            <p className="mb-4">Sign in to view and manage your wishlist.</p>
+            <Link to="/login">
+              <Button className="rounded-full px-6" style={{ background: "oklch(0.560 0.110 155)", color: "#fff" }}>
+                Sign in
+              </Button>
+            </Link>
+          </div>
+        ) : isLoading ? (
           <div className="flex justify-center items-center py-20">
             <Loader2 className="h-8 w-8 animate-spin" style={{ color: "oklch(0.560 0.110 155)" }} />
           </div>

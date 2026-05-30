@@ -54,7 +54,10 @@ function PlacesPage() {
     queryFn: async () => {
       try {
         const result = await getAllPlaces();
-        return result.data || result || FALLBACK_PLACES;
+        const placesFromApi = Array.isArray(result) ? result : result?.data;
+        return Array.isArray(placesFromApi) && placesFromApi.length > 0
+          ? placesFromApi
+          : FALLBACK_PLACES;
       } catch {
         return FALLBACK_PLACES;
       }
@@ -62,7 +65,7 @@ function PlacesPage() {
     staleTime: 1000 * 60 * 5,
   });
 
-  const allPlaces: Place[] = apiPlaces || FALLBACK_PLACES;
+  const allPlaces: Place[] = Array.isArray(apiPlaces) && apiPlaces.length > 0 ? apiPlaces : FALLBACK_PLACES;
   const [search, setSearch]     = useState("");
   const [wishlist, setWishlist] = useState<Place[]>([]);
   const [openSheet, setOpenSheet] = useState(false);
