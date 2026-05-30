@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.db.database import Base, engine
-from app.api.endpoints import auth, wishlists, memos
+from app.api.endpoints import auth, wishlists, memos, places
 from app.api.endpoints import profile as profile_routes
 from app.models import User, Place, Tag, PlaceTag, Season, Wishlist, WishlistItem, profile
 
@@ -24,6 +24,7 @@ app.add_middleware(
 app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
 app.include_router(wishlists.router, prefix="/api/wishlists", tags=["wishlists"])
 app.include_router(memos.router, prefix="/api/memos", tags=["memos"])
+app.include_router(places.router, prefix="/api/places", tags=["places"])
 app.include_router(profile_routes.router, prefix="/api/profiles", tags=["profiles"])
 
 
