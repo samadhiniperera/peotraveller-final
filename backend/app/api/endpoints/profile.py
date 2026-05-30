@@ -14,6 +14,28 @@ from app.schemas.profileContoler import (
 router = APIRouter()
 
 
+# ── GET CURRENT USER PROFILE ─────────────────────────────────────
+@router.get("/me")
+def get_my_profile(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    # Try to fetch profile record
+    profile = db.query(UserProfile).filter(UserProfile.user_id == current_user.id).first()
+
+    return {
+        "id": current_user.id,
+        "name": current_user.name,
+        "email": current_user.email,
+        "bio": getattr(profile, "bio", "") if profile else "",
+        "profileImage": getattr(profile, "profile_pic", None) if profile else None,
+        "location": None,
+        "joinedDate": getattr(current_user, "created_at", None),
+        "placesVisited": 0,
+        "placesWishlisted": 0,
+    }
+
+
 # ── UPDATE BIO ────────────────────────────────────────────────────
 @router.put("/update-bio", response_model=BioResponse)
 def update_bio(

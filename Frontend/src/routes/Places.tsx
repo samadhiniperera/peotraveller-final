@@ -1,9 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { createPortal } from "react-dom";
-import { Compass, Map as MapIcon, Heart, X } from "lucide-react";
+import { Compass, Map as MapIcon, Heart, X, User, Bookmark, Loader } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { PlaceCard, type Place } from "@/components/PlaceCard";
+import { addToWishlist as apiAddToWishlist } from "@/lib/api";
 import { PostCard } from "@/components/PostCard";
+import { getAllPlaces } from "@/lib/api";
 import {
   Sheet,
   SheetContent,
@@ -83,6 +87,9 @@ const places: Place[] = [
   },
 ];
 
+// Fallback places (used if API is down)
+const FALLBACK_PLACES = places;
+
 type FlyingBall = {
   id: number;
   fromX: number;
@@ -92,6 +99,22 @@ type FlyingBall = {
 };
 
 function PlacesPage() {
+  // Fetch places from API
+  const { data: apiPlaces, isLoading, isError } = useQuery({
+    queryKey: ["places"],
+    queryFn: async () => {
+      try {
+        const result = await getAllPlaces();
+        return result.data || result || FALLBACK_PLACES;
+      } catch (error) {
+        console.warn("Failed to fetch from API, using fallback data");
+        return FALLBACK_PLACES;
+      }
+    },
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+
+  const placesToDisplay = apiPlaces || FALLBACK_PLACES;
   const [wishlist, setWishlist] = useState<Place[]>([]);
   const [openSheet, setOpenSheet] = useState(false);
   const [viewing, setViewing] = useState<Place | null>(null);
@@ -118,9 +141,22 @@ function PlacesPage() {
       ]);
       // Add to wishlist after the ball arrives
       window.setTimeout(() => {
-        setWishlist((w) =>
-          w.some((p) => p.name === place.name) ? w : [...w, place],
-        );
+        // Try to call backend API if place exists on server (has id)
+        (async () => {
+          try {
+            // find server-side place id if available
+            const serverPlace = (placesToDisplay || []).find((sp: any) => sp.name === place.name);
+            if (serverPlace && serverPlace.id) {
+              await apiAddToWishlist(String(serverPlace.id));
+            }
+          } catch (err) {
+            console.warn("Failed to add to wishlist on server, falling back to local:", err);
+          } finally {
+            setWishlist((w) =>
+              w.some((p) => p.name === place.name) ? w : [...w, place],
+            );
+          }
+        })();
         setPulse(true);
         window.setTimeout(() => setPulse(false), 600);
         setBalls((b) => b.filter((x) => x.id !== id));
@@ -142,9 +178,26 @@ function PlacesPage() {
               Roamly
             </span>
           </Link>
-          <span className="text-sm text-muted-foreground">
-            {places.length} posts · {wishlist.length} saved
-          </span>
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-muted-foreground">
+              {placesToDisplay.length} posts · {wishlist.length} saved
+            </span>
+            <Link to="/wishlist">
+              <Button variant="ghost" size="icon" className="rounded-full relative">
+                <Bookmark className="h-5 w-5" />
+                {wishlist.length > 0 && (
+                  <span className="absolute top-0 right-0 h-5 w-5 rounded-full bg-primary text-xs text-primary-foreground flex items-center justify-center font-semibold">
+                    {wishlist.length}
+                  </span>
+                )}
+              </Button>
+            </Link>
+            <Link to="/profile">
+              <Button variant="ghost" size="icon" className="rounded-full">
+                <User className="h-5 w-5" />
+              </Button>
+            </Link>
+          </div>
         </div>
       </header>
 
@@ -170,15 +223,25 @@ function PlacesPage() {
         </div>
 
         <div className="space-y-8">
-          {places.map((p) => (
-            <PostCard
-              key={p.name}
-              place={p}
-              added={wishlist.some((w) => w.name === p.name)}
-              onAdd={handleAdd}
-              onView={setViewing}
-            />
-          ))}
+          {isLoading ? (
+            <div className="flex justify-center items-center py-12">
+              <Loader className="h-8 w-8 animate-spin text-primary" />
+            </div>
+          ) : placesToDisplay.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">No places found</p>
+            </div>
+          ) : (
+            placesToDisplay.map((p) => (
+              <PostCard
+                key={p.name}
+                place={p}
+                added={wishlist.some((w) => w.name === p.name)}
+                onAdd={handleAdd}
+                onView={setViewing}
+              />
+            ))
+          )}
         </div>
       </main>
 

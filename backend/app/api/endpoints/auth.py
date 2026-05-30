@@ -23,7 +23,7 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
     hashed_password = get_password_hash(user.password)
     new_user = User(
         email         = user.email,
-        name          = user.name,
+        name          = user.name or "",
         password_hash = hashed_password,
         role          = user.role
     )

@@ -120,7 +120,7 @@ function Landing() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    navigate({ to: "/places" });
+    navigate({ to: "/login" });
   };
 
   return (
@@ -240,16 +240,16 @@ function Landing() {
 
               <p className="mt-5 text-center text-sm text-muted-foreground">
                 New here?{" "}
-                <a href="#" className="font-medium text-primary hover:underline">
+                <Link to="/signup" className="font-medium text-primary hover:underline">
                   Create an account
-                </a>
+                </Link>
               </p>
             </div>
 
             <p className="mt-4 text-center text-xs text-muted-foreground">
               or{" "}
               <Link
-                to="/places"
+                to="/Places"
                 className="font-medium text-foreground hover:underline"
               >
                 continue as guest

@@ -108,12 +108,22 @@ function RootShell({ children }: { children: React.ReactNode }) {
   );
 }
 
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
+import { AuthProvider } from "@/lib/auth";
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Outlet />
+      <AuthProvider>
+        <Header />
+        <main>
+          <Outlet />
+        </main>
+        <Footer />
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

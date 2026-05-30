@@ -30,36 +30,14 @@ export function PlaceCard({ place }: { place: Place }) {
           </p>
         </div>
 
-        {/* Right: image stuck to card, blurred fade into details */}
-        <div className="relative w-1/2 sm:w-2/5 shrink-0 overflow-hidden">
+        {/* Right: image */}
+        <div className="relative h-full w-32 flex-shrink-0 overflow-hidden bg-muted">
           <img
             src={place.image}
-            alt={`${place.name}, ${place.city}`}
-            loading="lazy"
-            width={800}
-            height={800}
-            className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+            alt={place.name}
+            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
           />
-          {/* Blur fade overlay — strong on left edge, clear on right */}
-          <div
-            aria-hidden
-            className="absolute inset-0 backdrop-blur-md"
-            style={{
-              WebkitMaskImage:
-                "linear-gradient(to right, black 0%, rgba(0,0,0,0.55) 35%, transparent 75%)",
-              maskImage:
-                "linear-gradient(to right, black 0%, rgba(0,0,0,0.55) 35%, transparent 75%)",
-            }}
-          />
-          {/* Color fade so card body blends into image */}
-          <div
-            aria-hidden
-            className="absolute inset-0"
-            style={{
-              background:
-                "linear-gradient(to right, var(--card) 0%, color-mix(in oklab, var(--card) 60%, transparent) 35%, transparent 70%)",
-            }}
-          />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-l from-black/20 to-transparent" />
         </div>
       </div>
     </article>
