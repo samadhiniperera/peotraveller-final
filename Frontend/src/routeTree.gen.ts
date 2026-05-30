@@ -10,7 +10,6 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WishlistRouteImport } from './routes/wishlist'
-import { Route as SignupRouteImport } from './routes/signup'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as PlacesRouteImport } from './routes/Places'
@@ -19,11 +18,6 @@ import { Route as IndexRouteImport } from './routes/index'
 const WishlistRoute = WishlistRouteImport.update({
   id: '/wishlist',
   path: '/wishlist',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SignupRoute = SignupRouteImport.update({
-  id: '/signup',
-  path: '/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProfileRoute = ProfileRouteImport.update({
@@ -52,7 +46,6 @@ export interface FileRoutesByFullPath {
   '/Places': typeof PlacesRoute
   '/login': typeof LoginRoute
   '/profile': typeof ProfileRoute
-  '/signup': typeof SignupRoute
   '/wishlist': typeof WishlistRoute
 }
 export interface FileRoutesByTo {
@@ -60,7 +53,6 @@ export interface FileRoutesByTo {
   '/Places': typeof PlacesRoute
   '/login': typeof LoginRoute
   '/profile': typeof ProfileRoute
-  '/signup': typeof SignupRoute
   '/wishlist': typeof WishlistRoute
 }
 export interface FileRoutesById {
@@ -69,22 +61,14 @@ export interface FileRoutesById {
   '/Places': typeof PlacesRoute
   '/login': typeof LoginRoute
   '/profile': typeof ProfileRoute
-  '/signup': typeof SignupRoute
   '/wishlist': typeof WishlistRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/Places' | '/login' | '/profile' | '/signup' | '/wishlist'
+  fullPaths: '/' | '/Places' | '/login' | '/profile' | '/wishlist'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/Places' | '/login' | '/profile' | '/signup' | '/wishlist'
-  id:
-    | '__root__'
-    | '/'
-    | '/Places'
-    | '/login'
-    | '/profile'
-    | '/signup'
-    | '/wishlist'
+  to: '/' | '/Places' | '/login' | '/profile' | '/wishlist'
+  id: '__root__' | '/' | '/Places' | '/login' | '/profile' | '/wishlist'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -92,7 +76,6 @@ export interface RootRouteChildren {
   PlacesRoute: typeof PlacesRoute
   LoginRoute: typeof LoginRoute
   ProfileRoute: typeof ProfileRoute
-  SignupRoute: typeof SignupRoute
   WishlistRoute: typeof WishlistRoute
 }
 
@@ -103,13 +86,6 @@ declare module '@tanstack/react-router' {
       path: '/wishlist'
       fullPath: '/wishlist'
       preLoaderRoute: typeof WishlistRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/signup': {
-      id: '/signup'
-      path: '/signup'
-      fullPath: '/signup'
-      preLoaderRoute: typeof SignupRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/profile': {
@@ -148,7 +124,6 @@ const rootRouteChildren: RootRouteChildren = {
   PlacesRoute: PlacesRoute,
   LoginRoute: LoginRoute,
   ProfileRoute: ProfileRoute,
-  SignupRoute: SignupRoute,
   WishlistRoute: WishlistRoute,
 }
 export const routeTree = rootRouteImport

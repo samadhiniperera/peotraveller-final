@@ -1,171 +1,137 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
-import { Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { signupUser } from "@/lib/api";
-import { useAuth } from "@/lib/auth";
+// ======================================================
+// FILE: Frontend/src/components/PostCard.tsx
+// ======================================================
+import { MapPin, Plus, Eye, Check, Heart } from "lucide-react";
+import { useRef } from "react";
+import type { Place } from "@/components/PlaceCard";
 
-export const Route = createFileRoute("/signup")({
-  component: SignupPage,
-  head: () => ({
-    meta: [
-      { title: "Sign Up — Roamly" },
-      {
-        name: "description",
-        content: "Create your Roamly account and start planning your trips.",
-      },
-    ],
-  }),
-});
+type Props = {
+  place: Place;
+  added: boolean;
+  onAdd: (place: Place, originRect: DOMRect) => void;
+  onView: (place: Place) => void;
+};
 
-function SignupPage() {
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20">
-      <div className="flex items-center justify-center min-h-[calc(100vh-80px)] px-4 py-16">
-        <SignupForm />
-      </div>
-    </div>
-  );
-}
+export function PostCard({ place, added, onAdd, onView }: Props) {
+  const addBtnRef = useRef<HTMLButtonElement>(null);
 
-function SignupForm() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const navigate = useNavigate();
-
-  const { login } = useAuth();
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
-
-    try {
-      // Validation
-      if (!name || !email || !password || !confirmPassword) {
-        setError("Please fill in all fields");
-        return;
-      }
-
-      if (password !== confirmPassword) {
-        setError("Passwords do not match");
-        return;
-      }
-
-      if (password.length < 6) {
-        setError("Password must be at least 6 characters");
-        return;
-      }
-
-      // Call API to signup
-      await signupUser(email, password, name);
-      await login(email, password);
-      navigate({ to: "/Places" });
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Signup failed. Please try again.";
-      setError(errorMessage);
-      console.error("Signup error:", err);
-    } finally {
-      setLoading(false);
-    }
+  const handleAdd = () => {
+    if (added) return;
+    const rect = addBtnRef.current?.getBoundingClientRect();
+    if (rect) onAdd(place, rect);
   };
 
   return (
-    <div className="w-full max-w-sm space-y-6">
-      <div className="space-y-2">
-        <h1 className="text-2xl font-bold">Create account</h1>
-        <p className="text-sm text-muted-foreground">
-          Join Roamly and start planning your trips
+    <article className="group relative overflow-hidden rounded-2xl bg-card border border-border/50 card-hover">
+      {/* Image */}
+      <div className="relative aspect-[16/9] w-full overflow-hidden">
+        <img
+          src={place.image}
+          alt={`${place.name}, ${place.city}`}
+          loading="lazy"
+          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+        />
+        {/* Gradient */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+
+        {/* Action buttons */}
+        <div className="absolute top-3 right-3 flex gap-2 opacity-0 translate-y-[-6px] transition-all duration-200 group-hover:opacity-100 group-hover:translate-y-0 group-focus-within:opacity-100 group-focus-within:translate-y-0">
+          <button
+            ref={addBtnRef}
+            onClick={handleAdd}
+            disabled={added}
+            aria-label={added ? "Already in wishlist" : "Add to wishlist"}
+            className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold shadow-lg transition-all active:scale-95"
+            style={
+              added
+                ? { background: "oklch(0.560 0.110 155)", color: "#fff" }
+                : { background: "rgba(255,255,255,0.92)", color: "oklch(0.200 0.025 240)", backdropFilter: "blur(8px)" }
+            }
+          >
+            {added ? <Check className="h-3 w-3" /> : <Plus className="h-3 w-3" />}
+            {added ? "Saved" : "Save"}
+          </button>
+          <button
+            onClick={() => onView(place)}
+            aria-label="View details"
+            className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold shadow-lg transition-all active:scale-95"
+            style={{ background: "rgba(255,255,255,0.92)", color: "oklch(0.200 0.025 240)", backdropFilter: "blur(8px)" }}
+          >
+            <Eye className="h-3 w-3" />
+            View
+          </button>
+        </div>
+      </div>
+
+      {/* Body */}
+      <div className="p-5">
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-1.5">
+          <MapPin className="h-3.5 w-3.5" style={{ color: "oklch(0.560 0.110 155)" }} />
+          <span className="font-medium text-foreground/80">{place.city}</span>
+          <span>·</span>
+          <span>{place.country}</span>
+        </div>
+        <h3
+          className="text-xl font-semibold leading-snug text-foreground"
+          style={{ fontFamily: "'Lora', serif" }}
+        >
+          {place.name}
+        </h3>
+        <p className="mt-2 text-sm leading-relaxed text-muted-foreground line-clamp-2">
+          {place.description}
         </p>
       </div>
+    </article>
+  );
+}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {error && (
-          <div className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
-            {error}
+
+// ======================================================
+// FILE: Frontend/src/components/PlaceCard.tsx
+// ======================================================
+import { MapPin as MapPinIcon } from "lucide-react";
+
+export type Place = {
+  name: string;
+  city: string;
+  country: string;
+  description: string;
+  image: string;
+};
+
+export function PlaceCard({ place }: { place: Place }) {
+  return (
+    <article className="group relative overflow-hidden rounded-2xl bg-card border border-border/50 transition-all hover:shadow-md hover:border-primary/20">
+      <div className="flex h-32">
+        {/* Details */}
+        <div className="relative flex flex-1 flex-col justify-between p-4">
+          <div>
+            <h3
+              className="text-base font-semibold leading-tight text-foreground"
+              style={{ fontFamily: "'Lora', serif" }}
+            >
+              {place.name}
+            </h3>
+            <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
+              <MapPinIcon className="h-3 w-3" style={{ color: "oklch(0.560 0.110 155)" }} />
+              <span className="font-medium text-foreground/70">{place.city}</span>
+              <span>·</span>
+              <span>{place.country}</span>
+            </div>
           </div>
-        )}
-
-        <div className="space-y-2">
-          <Label htmlFor="name">Full Name</Label>
-          <Input
-            id="name"
-            type="text"
-            placeholder="John Doe"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            disabled={loading}
-            required
+          <p className="mt-2 line-clamp-2 text-xs text-muted-foreground leading-relaxed">
+            {place.description}
+          </p>
+        </div>
+        {/* Thumbnail */}
+        <div className="relative h-full w-28 flex-shrink-0 overflow-hidden bg-muted rounded-r-2xl">
+          <img
+            src={place.image}
+            alt={place.name}
+            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
           />
         </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
-          <Input
-            id="email"
-            type="email"
-            placeholder="you@example.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            disabled={loading}
-            required
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="password">Password</Label>
-          <Input
-            id="password"
-            type="password"
-            placeholder="••••••••"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            disabled={loading}
-            required
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="confirmPassword">Confirm Password</Label>
-          <Input
-            id="confirmPassword"
-            type="password"
-            placeholder="••••••••"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            disabled={loading}
-            required
-          />
-        </div>
-
-        <Button
-          type="submit"
-          className="w-full"
-          disabled={loading}
-        >
-          {loading ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Creating account...
-            </>
-          ) : (
-            "Create Account"
-          )}
-        </Button>
-      </form>
-
-      <div className="text-center text-sm text-muted-foreground">
-        Already have an account?{" "}
-        <Link to="/login" className="font-semibold text-primary hover:underline">
-          Sign in
-        </Link>
       </div>
-    </div>
+    </article>
   );
 }
